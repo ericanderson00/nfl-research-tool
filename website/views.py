@@ -3,7 +3,8 @@ from flask_login import login_required, current_user #this is why I need UserMix
 from .models import Note
 from . import db
 
-from utils.playerGameLog import get_player_game_log
+
+from utils.playerGameLog import get_player_game_log, rec_per_game_bar_graph
 from utils.playerListAPI import get_player_info
 
 
@@ -67,6 +68,9 @@ def nfl_research_tool():
             flash(player_data['error'], category='error')
             return redirect(url_for('views.nfl_research_tool'))
         
-        return render_template("research_tool.html", user=current_user, player_data=player_data)
+        if 'game_log' in player_data:
+            rec_per_game_bar_graph(player_data['game_log'])
+        
+        return render_template("research_tool.html", user=current_user, player_data=player_data, show_graph=True)
      
-    return render_template("research_tool.html", user=current_user)
+    return render_template("research_tool.html", user=current_user, show_graph=False)

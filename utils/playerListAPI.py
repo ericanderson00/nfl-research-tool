@@ -29,7 +29,7 @@ def get_player_info(player_name):
 
 if __name__ == "__main__":
     
-    player_info = get_player_info("Jayden Daniels")
+    player_info = get_player_info("Baker Mayfield")
     if player_info:
         print(player_info["id"])  # Accessing by key
         print(player_info["pos"])  # Accessing by key

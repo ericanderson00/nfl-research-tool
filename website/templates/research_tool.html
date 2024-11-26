@@ -19,11 +19,24 @@
         
         <h2>Player: {{ player_data['player_name'] }}</h2>
         <h3>Position: {{ player_data['player_pos'] }}</h3>
-        <h4>Game Logs:</h4>
+        <h4>Game Log:</h4>
         <ul>
+
+            {%if show_graph %}
+            <img src="{{ url_for('static',filename='rec_bar_graph.png') }}" alt="Receptions Bar Graph">
+            {% endif %}
             {% for game in player_data['game_log'] %}
                 <li>
                     <strong>Game ID:</strong> {{ game['game_id'] }}
+                    {% if game['passing_stats'] %}
+                        <h5>Passing Stats:</h5>
+                        <ul>
+                            {% for key, value in game['passing_stats'].items() %}
+                            <li> {{ key }}: {{ value}}</li>
+                            {%endfor%}
+                        </ul>
+                    {%endif%}
+                    
                     {% if game['rushing_stats'] %}
                         <h5>Rushing Stats:</h5>
                         <ul>
@@ -41,6 +54,7 @@
                         </ul>
                     {% endif %}
                 </li>
+                <br />
             {% endfor %}
         </ul>
     {% endif %}
