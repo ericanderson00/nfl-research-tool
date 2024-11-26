@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.ticker as ticker
 
-from playerListAPI import get_player_info
+from .playerListAPI import get_player_info
 
 
 def get_player_game_log(player_name):
