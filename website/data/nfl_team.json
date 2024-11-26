@@ -1,0 +1,291 @@
+[
+    {
+        "id": 1,
+        "city": "Arizona",
+        "name": "Cardinals",
+        "abr": "ARI",
+        "conf": "NFC",
+        "div": "West",
+        "logo": "/static/logos/nfl-arizona-cardinals-team-logo-2.png"
+        
+    },
+    {
+        "id": 2,
+        "city": "Atlanta",
+        "name": "Falcons",
+        "abr": "ATL",
+        "conf": "NFC",
+        "div": "South",
+        "logo": "/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 3,
+        "city": "Baltimore",
+        "name": "Ravens",
+        "abr": "BAL",
+        "conf": "AFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 4,
+        "city": "Buffalo",
+        "name": "Bills",
+        "abr": "BUF",
+        "conf": "AFC",
+        "div": "EAST",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 5,
+        "city": "Carolina",
+        "name": "Panthers",
+        "abr": "CAR",
+        "conf": "NFC",
+        "div": "South",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 6,
+        "city": "Cincinati",
+        "name": "Bengals",
+        "abr": "CIN",
+        "conf": "AFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 7,
+        "city": "Chicago",
+        "name": "Bears",
+        "abr": "CIN",
+        "conf": "NFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 8,
+        "city": "Cleveland",
+        "name": "Browns",
+        "abr": "CLE",
+        "conf": "AFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 9,
+        "city": "Dallas",
+        "name": "Cowboys",
+        "abr": "DAL",
+        "conf": "NFC",
+        "div": "East",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 10,
+        "city": "Denver",
+        "name": "Broncos",
+        "abr": "DEN",
+        "conf": "AFC",
+        "div": "West",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 11,
+        "city": "Detroit",
+        "name": "Lions",
+        "abr": "DET",
+        "conf": "NFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 12,
+        "city": "Green Bay",
+        "name": "Packers",
+        "abr": "GB",
+        "conf": "NFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 13,
+        "city": "Houston",
+        "name": "Texans",
+        "abr": "HOU",
+        "conf": "AFC",
+        "div": "South",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 14,
+        "city": "Indianapolis",
+        "name": "Colts",
+        "abr": "IND",
+        "conf": "AFC",
+        "div": "South",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 15,
+        "city": "Jacksonville",
+        "name": "Jaquars",
+        "abr": "JAX",
+        "conf": "AFC",
+        "div": "South",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 16,
+        "city": "Kansas City",
+        "name": "Chiefts",
+        "abr": "KC",
+        "conf": "AFC",
+        "div": "West",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 17,
+        "city": "Miami",
+        "name": "Dolphins",
+        "abr": "MIA",
+        "conf": "AFC",
+        "div": "East",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 18,
+        "city": "Minnesota",
+        "name": "Vikings",
+        "abr": "MIN",
+        "conf": "AFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 19,
+        "city": "New England",
+        "name": "Patriots",
+        "abr": "NE",
+        "conf": "AFC",
+        "div": "East",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 20,
+        "city": "New Orleans",
+        "name": "Saints",
+        "abr": "NO",
+        "conf": "NFC",
+        "div": "South",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 21,
+        "city": "New York",
+        "name": "Giants",
+        "abr": "NYG",
+        "conf": "NFC",
+        "div": "East",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 22,
+        "city": "New York",
+        "name": "Jets",
+        "abr": "NYJ",
+        "conf": "AFC",
+        "div": "East",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 23,
+        "city": "Oakland",
+        "name": "Raiders",
+        "abr": "OAK",
+        "conf": "AFC",
+        "div": "West",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 24,
+        "city": "Philidelphia",
+        "name": "Eagles",
+        "abr": "PHI",
+        "conf": "NFC",
+        "div": "East",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 25,
+        "city": "Pittsburgh",
+        "name": "Steelers",
+        "abr": "PIT",
+        "conf": "AFC",
+        "div": "North",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 26,
+        "city": "San Diego",
+        "name": "Chargers",
+        "abr": "SD",
+        "conf": "AFC",
+        "div": "West",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 27,
+        "city": "Seattle",
+        "name": "Seahawks",
+        "abr": "SEA",
+        "conf": "NFC",
+        "div": "West",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 28,
+        "city": "San Francisco",
+        "name": "49ers",
+        "abr": "SF",
+        "conf": "NFC",
+        "div": "West",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 29,
+        "city": "St. Louis",
+        "name": "Rams",
+        "abr": "STL",
+        "conf": "NFC",
+        "div": "West",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 30,
+        "city": "Tampa Bay",
+        "name": "Buccaneers",
+        "abr": "TB",
+        "conf": "NFC",
+        "div": "South",
+        "logo": "website/static/logos/los-angeles-rams-2020-logo.png"
+    },
+    {
+        "id": 31,
+        "city": "Tennessee",
+        "name": "Titants",
+        "abr": "TEN",
+        "conf": "AFC",
+        "div": "South",
+        "logo": "website/static/logos/tampa-bay-buccaneers-2020-logo.png"
+    },
+    {
+        "id": 32,
+        "city": "Washington",
+        "name": "Redskins",
+        "abr": "WAS",
+        "conf": "NFC",
+        "div": "East",
+        "logo": "website/static/logos/washington-commanders-logo.png"
+    }
+]

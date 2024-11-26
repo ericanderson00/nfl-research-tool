@@ -1,0 +1,22 @@
+.logos-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /* Distribute items evenly */
+    gap: 20px; /* Add space between items */
+}
+
+.team-card {
+    flex: 1 1 calc(25% - 20px); /* Adjusts size to fit 4 per row */
+    margin: 10px;
+    text-align: center;
+}
+
+.team-logo {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100px; /* Adjust width to an appropriate size */
+    height: 100px; /* Adjust height to an appropriate size */
+}

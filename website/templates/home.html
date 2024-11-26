@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %}
+{%block content%}
+
+<h1 align="center">Home</h1>
+
+<style>
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 50px;
+    }
+    .btn {
+        padding: 15px 30px;
+        font-size: 18px;
+        text-decoration: none;
+        color: white;
+        background-color: #007BFF;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<h2 align="left">Welcome, {{user.first_name}}</h2>
+<div class="btn-container">    
+    <a href="{{ url_for('views.note') }}" class="btn">Notes</a>
+    <a href="{{ url_for('views.nfl_research_tool') }}" class="btn">NFL Research Tool</a>
+</div>
+
+
+
+{% endblock %}

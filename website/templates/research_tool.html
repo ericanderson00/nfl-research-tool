@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% block title %}NFL Research Tool{% endblock %}
+{%block content%}
+<head>
+    <title>NFL Research Tool</title>
+</head>
+<body>
+    <h1 align="center">Search for Player Game Log</h1>
+    <br />
+    <form align="center" action="{{ url_for('views.nfl_research_tool') }}" method="POST">
+        <input align="center" type="text" name="player_name" placeholder="Enter Player Name" required>
+        <button type="submit">Search</button>
+    </form>
+    {% if player_data %}
+        {% if player_data['player_pic'] %}
+            <img src="{{player_data['player_pic']}}" alt="Player Profile Picture" width="300" height="218">
+        {% else %}
+            <p>No profile picture available</p>
+        {% endif %}
+        
+        <h2>Player: {{ player_data['player_name'] }}</h2>
+        <h3>Position: {{ player_data['player_pos'] }}</h3>
+        <h4>Game Logs:</h4>
+        <ul>
+            {% for game in player_data['game_log'] %}
+                <li>
+                    <strong>Game ID:</strong> {{ game['game_id'] }}
+                    {% if game['rushing_stats'] %}
+                        <h5>Rushing Stats:</h5>
+                        <ul>
+                            {% for key, value in game['rushing_stats'].items() %}
+                                <li>{{ key }}: {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if game['rec_stats'] %}
+                        <h5>Receiving Stats:</h5>
+                        <ul>
+                            {% for key, value in game['rec_stats'].items() %}
+                                <li>{{ key }}: {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+
+
+
+{% endblock %}
