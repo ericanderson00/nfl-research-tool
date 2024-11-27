@@ -60,7 +60,7 @@ def nfl_research_tool():
             flash("Player name cannot be empty!", category='error')
             return redirect(url_for('views.nfl_research_tool'))
         
-        #var is the function that passes in the inputed name
+        #player_data is the function that passes in the inputed name
         #use player_data for logic to display game log info
         player_data = get_player_game_log(player_name)
         

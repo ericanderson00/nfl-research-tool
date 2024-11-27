@@ -77,9 +77,10 @@ def get_player_game_log(player_name):
             "player_id" :player_id,
             "player_name" : long_name,
             "player_pos" : player_pos,
-            "game_log" : game_log,
+            "game_log" : game_log, #list of dict
             "player_pic": player_pic            
         }
+        
         # this print was just to test endpoint on rapidapi to make sure the player id matches (delete later)
         # print(player_id)
     else:
@@ -108,8 +109,6 @@ def get_and_plot_player_receptions(player_name):
     receptions = [float(game['receptions']) for game in rec_data]
     
     # make bar graph
-    positions = range(len(receptions))
-    
     plt.bar(game_ids, receptions, color='skyblue')
     plt.xticks(rotation=45, ha='right')
     plt.show()

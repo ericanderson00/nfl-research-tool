@@ -10,6 +10,7 @@
         <input align="center" type="text" name="player_name" placeholder="Enter Player Name" required>
         <button type="submit">Search</button>
     </form>
+    
     {% if player_data %}
         {% if player_data['player_pic'] %}
             <img src="{{player_data['player_pic']}}" alt="Player Profile Picture" width="300" height="218">
