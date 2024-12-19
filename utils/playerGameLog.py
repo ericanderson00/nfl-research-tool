@@ -116,4 +116,4 @@ def get_and_plot_player_receptions(player_name):
 
 if __name__ == "__main__":
     
-    get_and_plot_player_receptions("Justin Jefferson")
+    get_player_game_log("Justin Jefferson")

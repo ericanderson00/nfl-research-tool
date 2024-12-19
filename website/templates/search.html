@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% block title %}NFL Research Tool{% endblock %}
+{%block content%}
+<head>
+    <title>NFL Research Tool</title>
+</head>
+<br />
+<form align="center" action="{{ url_for('views.searchPlayer') }}" method="POST">
+    <div class="form-group">
+        <label for="playerName">Search for a Player:</label>
+        <input
+            type="text"
+            id="playerName"
+            name="playerName"
+            class="form-control"
+            placeholder="Enter player name"
+            required
+        />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<hr />
+
+{% if search_results %}
+    <h3>Search Results</h3>
+    <ul>
+        {% for player in search_results %}
+            <li>
+                <a href="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
+                    {{ player.playerName }} ( {{ player.team }} - {{ player.pos }} )
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% elif error_message %}
+    <p class="text-danger">{{ error_message }}</p>
+{% endif %}
+
+{%endblock %}

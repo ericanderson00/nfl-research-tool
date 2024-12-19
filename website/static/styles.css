@@ -1,22 +1,21 @@
-.logos-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around; /* Distribute items evenly */
-    gap: 20px; /* Add space between items */
+
+
+/* 
+table th, table td {
+    text-align: center; /* Centers the text */
+    /* padding: 10px;      Adds space inside the cells */
+    /* vertical-align: middle; Aligns the content vertically */
+/* } */
+
+/* table {
+    max-width: 800px; /* Makes the table take up the full width of the container */
+    /* margin: 0 auto; Adds spacing above and below the table */
+/* } */
+
+
+.chart-container {
+    max-width: 100px; /* Set the max width to limit the stretch */
+    margin: 0 auto;   /* Center the chart horizontally */
+    padding: 20px;    /* Optional padding for some spacing around the chart */
 }
 
-.team-card {
-    flex: 1 1 calc(25% - 20px); /* Adjusts size to fit 4 per row */
-    margin: 10px;
-    text-align: center;
-}
-
-.team-logo {
-    max-width: 100%;
-    height: auto;
-    border: 1px solid #ccc;
-    padding: 5px;
-    border-radius: 5px;
-    width: 100px; /* Adjust width to an appropriate size */
-    height: 100px; /* Adjust height to an appropriate size */
-}

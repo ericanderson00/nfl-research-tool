@@ -1,11 +1,9 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user #this is why I need UserMixin in models.py
-from .models import Note
+from .models import Note, PlayerInfo, GameLog
 from . import db
+import json
 
-
-from utils.playerGameLog import get_player_game_log
-from utils.playerListAPI import get_player_info
 
 
 import json
@@ -33,6 +31,7 @@ def note():
 
 
 @views.route('/delete-note', methods=['POST'])
+@login_required
 def delete_note():
     note = json.loads(request.data)
     noteId = note['noteId']
@@ -45,32 +44,66 @@ def delete_note():
     return jsonify({})
 
 
-# change the route to match the method
-@views.route('/nfl_research_tool', methods=['GET','POST'])
+
+@views.route('/searchPlayer', methods=['GET','POST'])
 @login_required
-def nfl_research_tool():
+def searchPlayer():
     
+    search_results = []
+    selected_filters = []
+    error_message = None
     #when submit happens
     if request.method == 'POST':
         
         #player name = whatever is in text field
-        player_name = request.form.get('player_name', '').strip()
+        player_name = request.form.get('playerName')
+        selected_filters = request.form.getlist('statsFilter') or selected_filters
+
+
+        if player_name:
+            search_results = PlayerInfo.query.filter(PlayerInfo.playerName.ilike(f'%{player_name}%')).all()
+            if not search_results:
+                error_message = f"No players found with the name '{player_name}'"
+                
         
-        if not player_name:
-            flash("Player name cannot be empty!", category='error')
-            return redirect(url_for('views.nfl_research_tool'))
+
+    return render_template("search.html", search_results=search_results, error_message=error_message)  
+  
+
+@views.route('/playerProfile/<int:player_id>', methods=['GET','POST'])
+@login_required
+def playerProfile(player_id):
+    
+    # print(f"Searching for player with ID: {player_id}")
+    
+    table_filters = ['passing', 'rushing', 'receiving']
+    chart_filters = []
+    player = PlayerInfo.query.get(player_id)
+    print(PlayerInfo.query.get(player_id))
+    game_logs = []
+    
+    # sets the default filter based off position
+    if player.pos == 'QB':  
+        table_filters = ['passing']
+    elif player.pos == 'RB':  
+        table_filters = ['rushing']
+    elif player.pos == 'WR':  
+        table_filters = ['receiving']
+    elif player.pos == 'TE':  
+        table_filters = ['receiving']
+    else:
+        table_filters = ['passing', 'rushing', 'receiving']  # For all other positions, show all stats
+    
+    if request.method == 'POST':
+        table_filters = request.form.getlist('statsFilter') or table_filters
         
-        #player_data is the function that passes in the inputed name
-        #use player_data for logic to display game log info
-        player_data = get_player_game_log(player_name)
-        
-        if 'error' in player_data:
-            flash(player_data['error'], category='error')
-            return redirect(url_for('views.nfl_research_tool'))
-        
-        # if 'game_log' in player_data:
-        #     rec_per_game_bar_graph(player_data['game_log'])
-        
-        return render_template("research_tool.html", user=current_user, player_data=player_data, ) #, show_graph=True) add when plot works on webpage
-     
-    return render_template("research_tool.html", user=current_user) #, show_graph=False) add when plot works webpage
+    game_logs = GameLog.query.filter_by(playerID=player_id).order_by(
+        GameLog.year.desc(), GameLog.week.desc()
+    ).all()  
+    
+    return render_template(
+        "player_profile.html", 
+        player=player, 
+        game_logs=game_logs, 
+        table_filters=table_filters
+    )

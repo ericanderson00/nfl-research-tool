@@ -1,0 +1,174 @@
+{% extends "base.html" %} {% block title %}Player Profile{% endblock %}
+{%block content%}
+
+<br />
+<form align="center" action="{{ url_for('views.searchPlayer') }}" method="POST">
+    <div class="form-group">
+        <label for="playerName">Search for a Player:</label>
+        <input
+            type="text"
+            id="playerName"
+            name="playerName"
+            class="form-control"
+            placeholder="Enter player name"
+            required
+        />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<h1>Player Profile: {{ player.playerName }}</h1>
+<p><strong>Team:</strong> {{ player.team }}</p>
+<p><strong>Position:</strong> {{ player.pos }}</p>
+
+<hr />
+<form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
+    <label><strong>Filters for Game Logs: </strong></label>
+    <div class="d-inline">
+        <input class="gamelogCheckBoxes" type="checkbox" name="statsFilter" value="passing" {% if 'passing' in table_filters %}checked{% endif %}> Passing
+        <input type="checkbox" name="statsFilter" value="rushing" {% if 'rushing' in table_filters %}checked{% endif %}> Rushing
+        <input type="checkbox" name="statsFilter" value="receiving" {% if 'receiving' in table_filters %}checked{% endif %}> Receiving
+        <button type="submit" class="btn btn-secondary">Apply Filter</button>
+    </div>
+    
+</form>
+
+<!--test code--> 
+<hr />
+<form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
+    <div class="d-inline">
+        <label><strong>Filters for Chart: </strong></label>
+            <input type="radio" name="statsFilter" value="passing" {% if 'passing' in chart_filters %}checked{% endif %}> Passing
+            <input type="radio" name="statsFilter" value="rushing" {% if 'rushing' in chart_filters %}checked{% endif %}> Rushing
+            <input type="radio" name="statsFilter" value="receiving" {% if 'receiving' in chart_filters %}checked{% endif %}> Receiving
+            <button align="inline" type="submit" class="btn btn-secondary">Apply Filter</button>
+    </div>
+    
+</form>
+<!--test code--> 
+
+<br />
+<div>
+    <button id="chartButton" class="btn btn-primary" onclick="toggleChartView()">Show Chart</button>
+</div>
+<div id="chartContainer" style="display: none;">
+    <canvas id="gameLogsChart"></canvas>
+</div>
+
+
+<h2>Game Logs</h2>
+<div class="chart-container">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Year</th>
+                <th>Week</th>
+                <th>Opponent</th>
+                {% if 'passing' in table_filters %}
+                    <th>Passing Yards</th>
+                    <th>Passing TD</th>
+                    <th>Interceptions</th>
+                {% endif %}
+                {% if 'rushing' in table_filters %}
+                    <th>Rushing Yards</th>
+                    <th>Rushing TD</th>
+                {% endif %}
+                {% if 'receiving' in table_filters %}
+                    <th>Receptions</th>
+                    <th>Receiving Yards</th>
+                    <th>Targets</th>
+                    <th>Receiving TD</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in game_logs %}
+            <tr>
+                <td>{{ log.year }}</td>
+                <td>{{ log.week }}</td>
+                <td>{{ log.playerOpp }}</td>
+
+                {% if 'passing' in table_filters %}
+                    <td>{{ log.passYards }}</td>
+                    <td>{{ log.passTD }}</td>
+                    <td>{{ log.interceptions }}</td>
+                {%endif%}
+
+                {% if 'rushing' in table_filters %}
+                    <td>{{ log.rushYards }}</td>
+                    <td>{{ log.rushTD }}</td>
+
+                {% endif %}
+
+                {% if 'receiving' in table_filters %}
+                    <td>{{ log.receptions }}</td>    
+                    <td>{{ log.recYds }}</td>
+                    <td>{{ log.targets }}</td>
+                    <td>{{ log.recTD }}</td>
+                {% endif %}
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    let chartData = {
+        labels: [{% for log in game_logs %}'Week {{ log.week }}' {% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Receptions',
+            data: [{% for log in game_logs %}{{ log.receptions }} {% if not loop.last %},{% endif %}{% endfor %}],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 1
+        }]
+    };
+
+    let chartConfig = {
+        type: 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    let gameLogsChart;
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize the chart on page load
+        gameLogsChart = new Chart(document.getElementById('gameLogsChart'), chartConfig);
+    });
+
+    function toggleChartView() {
+        let chartContainer = document.getElementById('chartContainer');
+        let tableContainer = document.getElementById('tableContainer');
+        let chartButton = document.getElementById('chartButton');
+        let tableButton = document.getElementById('tableButton');
+
+        if (chartContainer.style.display === 'none') {
+            chartContainer.style.display = 'block';
+            tableContainer.style.display = 'none';
+            chartButton.classList.add('btn-primary');
+            chartButton.classList.remove('btn-secondary');
+            tableButton.classList.add('btn-secondary');
+            tableButton.classList.remove('btn-primary');
+        } else {
+            chartContainer.style.display = 'none';
+            tableContainer.style.display = 'block';
+            chartButton.classList.add('btn-secondary');
+            chartButton.classList.remove('btn-primary');
+            tableButton.classList.add('btn-primary');
+            tableButton.classList.remove('btn-secondary');
+        }
+    }
+</script>
+
+
+
+{%endblock%}
