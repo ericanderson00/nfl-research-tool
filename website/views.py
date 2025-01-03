@@ -50,14 +50,12 @@ def delete_note():
 def searchPlayer():
     
     search_results = []
-    selected_filters = []
     error_message = None
     #when submit happens
     if request.method == 'POST':
         
         #player name = whatever is in text field
         player_name = request.form.get('playerName')
-        selected_filters = request.form.getlist('statsFilter') or selected_filters
 
 
         if player_name:
@@ -74,10 +72,12 @@ def searchPlayer():
 @login_required
 def playerProfile(player_id):
     
+    table_filters = []
+    bar_filters = None
+        
     # print(f"Searching for player with ID: {player_id}")
     
-    table_filters = ['passing', 'rushing', 'receiving']
-    chart_filters = []
+    
     player = PlayerInfo.query.get(player_id)
     print(PlayerInfo.query.get(player_id))
     game_logs = []
@@ -91,19 +91,62 @@ def playerProfile(player_id):
         table_filters = ['receiving']
     elif player.pos == 'TE':  
         table_filters = ['receiving']
+    elif player.pos == 'TE':
+        table_filters = ['kicking']
     else:
         table_filters = ['passing', 'rushing', 'receiving']  # For all other positions, show all stats
     
     if request.method == 'POST':
-        table_filters = request.form.getlist('statsFilter') or table_filters
-        
+        table_filters = request.form.getlist('tableFilter')
+        bar_filters = request.form.get('barFilter')
+        print(f"Selected table Filter: {table_filters}")
+
+    #descending
     game_logs = GameLog.query.filter_by(playerID=player_id).order_by(
         GameLog.year.desc(), GameLog.week.desc()
-    ).all()  
+    ).all()
+    
+    #ascending
+    game_logs2 = GameLog.query.filter_by(playerID=player_id).order_by(
+        GameLog.year.asc(), GameLog.week.asc()
+    ).all()
+    
+    
+    
+    recYdsArr = []
+    receptionsArr = []
+    rushingYdsArr = []
+    passYardsArr= []
+    barDataArr = []
+    print(bar_filters)
+    if bar_filters == 'passYards':
+        for i in game_logs2:
+            barDataArr.append(i.passYards)
+    elif bar_filters == 'rushYards':
+        for i in game_logs2:
+            barDataArr.append(i.rushYards)
+    if bar_filters == 'recYds':
+        for i in game_logs2:
+            barDataArr.append(i.recYds)
+    if bar_filters == 'receptions':
+        for i in game_logs2:
+            barDataArr.append(i.receptions)
+            
+            
+        # barDataArr.append(i.bar_filters)
+        # recYdsArr.append(i.bar_filters)
+        # receptionsArr.append(i.bar_filters)
+        # rushingYdsArr.append(i.bar_filters)
+        # passYardsArr.append(i.bar_filters)
+    
+    print(barDataArr)
     
     return render_template(
         "player_profile.html", 
         player=player, 
-        game_logs=game_logs, 
-        table_filters=table_filters
+        game_logs=game_logs,
+        game_logs2=game_logs2, 
+        table_filters=table_filters,
+        bar_filters=bar_filters,
+        bar_data=barDataArr
     )

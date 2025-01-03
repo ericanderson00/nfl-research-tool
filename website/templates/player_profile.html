@@ -13,10 +13,12 @@
             placeholder="Enter player name"
             required
         />
+        <button type="submit" class="btn btn-primary">Search</button>
     </div>
-    <button type="submit" class="btn btn-primary">Search</button>
+    
 </form>
 
+<!-- <h1>{{bar_filters}}</h1> -->
 <h1>Player Profile: {{ player.playerName }}</h1>
 <p><strong>Team:</strong> {{ player.team }}</p>
 <p><strong>Position:</strong> {{ player.pos }}</p>
@@ -25,10 +27,12 @@
 <form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
     <label><strong>Filters for Game Logs: </strong></label>
     <div class="d-inline">
-        <input class="gamelogCheckBoxes" type="checkbox" name="statsFilter" value="passing" {% if 'passing' in table_filters %}checked{% endif %}> Passing
-        <input type="checkbox" name="statsFilter" value="rushing" {% if 'rushing' in table_filters %}checked{% endif %}> Rushing
-        <input type="checkbox" name="statsFilter" value="receiving" {% if 'receiving' in table_filters %}checked{% endif %}> Receiving
-        <button type="submit" class="btn btn-secondary">Apply Filter</button>
+        <input type="checkbox" name="tableFilter" value="passing" {% if 'passing' in table_filters %}checked{% endif %}> Passing
+        <input type="checkbox" name="tableFilter" value="rushing" {% if 'rushing' in table_filters %}checked{% endif %}> Rushing
+        <input type="checkbox" name="tableFilter" value="receiving" {% if 'receiving' in table_filters %}checked{% endif %}> Receiving
+        <input type="checkbox" name="tableFilter" value="kicking" {% if 'kicking' in table_filters %}checked{% endif %}> Kicking
+        
+        <button type="submit" name="action" value="filter_gamelogs" class="btn btn-secondary">Apply Filter</button>
     </div>
     
 </form>
@@ -38,20 +42,21 @@
 <form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
     <div class="d-inline">
         <label><strong>Filters for Chart: </strong></label>
-            <input type="radio" name="statsFilter" value="passing" {% if 'passing' in chart_filters %}checked{% endif %}> Passing
-            <input type="radio" name="statsFilter" value="rushing" {% if 'rushing' in chart_filters %}checked{% endif %}> Rushing
-            <input type="radio" name="statsFilter" value="receiving" {% if 'receiving' in chart_filters %}checked{% endif %}> Receiving
-            <button align="inline" type="submit" class="btn btn-secondary">Apply Filter</button>
+        <input type="radio" name="barFilter" value="passYards" {% if bar_filters == 'passYards' %}checked{% endif %}> Passing Yards
+        <input type="radio" name="barFilter" value="rushYards" {% if bar_filters == 'rushYards' %}checked{% endif %}> Rushing Yards
+        <input type="radio" name="barFilter" value="recYds" {% if bar_filters == 'recYds' %}checked{% endif %}> Receiving Yards
+        <input type="radio" name="barFilter" value="receptions" {% if bar_filters == 'receptions' %}checked{% endif %}> Receptions    
+                     
+        <button align="inline" type="submit" name="action" value="filter_chart" class="btn btn-secondary">Apply Filter</button>
     </div>
-    
 </form>
+<hr />
+
 <!--test code--> 
 
 <br />
-<div>
-    <button id="chartButton" class="btn btn-primary" onclick="toggleChartView()">Show Chart</button>
-</div>
-<div id="chartContainer" style="display: none;">
+
+<div id="chartContainer">
     <canvas id="gameLogsChart"></canvas>
 </div>
 
@@ -78,6 +83,9 @@
                     <th>Receiving Yards</th>
                     <th>Targets</th>
                     <th>Receiving TD</th>
+                {% endif %}
+                {% if 'kicking' in table_filters %}
+                    <th>Kicking</th>
                 {% endif %}
             </tr>
         </thead>
@@ -115,58 +123,48 @@
 
 
 <script>
-    let chartData = {
-        labels: [{% for log in game_logs %}'Week {{ log.week }}' {% if not loop.last %},{% endif %}{% endfor %}],
-        datasets: [{
-            label: 'Receptions',
-            data: [{% for log in game_logs %}{{ log.receptions }} {% if not loop.last %},{% endif %}{% endfor %}],
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderWidth: 1
-        }]
-    };
+    let gameLogsChart;
 
-    let chartConfig = {
-        type: 'bar',
-        data: chartData,
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+    function updateChart(barLabel, barData) {
+        const chartContainer = document.getElementById('chartContainer');
+        const chartElement = document.getElementById('gameLogsChart');
+    
+        if (gameLogsChart) {
+            gameLogsChart.destroy();
+        }
+    
+        const updatedChartData = {
+            labels: [{% for log in game_logs2 %}'Week {{ log.week }}' {% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: barLabel,
+                data: barData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 1
+            }]
+        };
+    
+        gameLogsChart = new Chart(chartElement, {
+            type: 'bar',
+            data: updatedChartData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    };
-
-    let gameLogsChart;
+        });
+    }
+    
+    // On page load, initialize the chart
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize the chart on page load
-        gameLogsChart = new Chart(document.getElementById('gameLogsChart'), chartConfig);
+        const initialBarLabel = '{{ bar_filters }}';
+        const initialBarData = JSON.parse('{{ bar_data | tojson }}');
+        updateChart(initialBarLabel, initialBarData);
     });
 
-    function toggleChartView() {
-        let chartContainer = document.getElementById('chartContainer');
-        let tableContainer = document.getElementById('tableContainer');
-        let chartButton = document.getElementById('chartButton');
-        let tableButton = document.getElementById('tableButton');
-
-        if (chartContainer.style.display === 'none') {
-            chartContainer.style.display = 'block';
-            tableContainer.style.display = 'none';
-            chartButton.classList.add('btn-primary');
-            chartButton.classList.remove('btn-secondary');
-            tableButton.classList.add('btn-secondary');
-            tableButton.classList.remove('btn-primary');
-        } else {
-            chartContainer.style.display = 'none';
-            tableContainer.style.display = 'block';
-            chartButton.classList.add('btn-secondary');
-            chartButton.classList.remove('btn-primary');
-            tableButton.classList.add('btn-primary');
-            tableButton.classList.remove('btn-secondary');
-        }
-    }
 </script>
 
 

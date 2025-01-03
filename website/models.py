@@ -52,7 +52,6 @@ class GameLog(db.Model):
     carries = db.Column(db.Integer, default=0) #add later
     longRush = db.Column(db.Float, default=0)#add later
     
-    
     passYards = db.Column(db.Integer, default=0)
     passTD = db.Column(db.Integer, default=0)
     interceptions = db.Column(db.Integer, default=0)
