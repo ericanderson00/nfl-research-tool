@@ -31,24 +31,29 @@
         <input type="checkbox" name="tableFilter" value="rushing" {% if 'rushing' in table_filters %}checked{% endif %}> Rushing
         <input type="checkbox" name="tableFilter" value="receiving" {% if 'receiving' in table_filters %}checked{% endif %}> Receiving
         <input type="checkbox" name="tableFilter" value="kicking" {% if 'kicking' in table_filters %}checked{% endif %}> Kicking
-        
-        <button type="submit" name="action" value="filter_gamelogs" class="btn btn-secondary">Apply Filter</button>
+        <input type="checkbox" name="tableFilter" value="touchdowns" {% if 'touchdowns' in table_filters %}checked{% endif %}> Touchdowns
     </div>
     
-</form>
-
-<!--test code--> 
-<hr />
-<form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
-    <div class="d-inline">
+    <div >
         <label><strong>Filters for Chart: </strong></label>
+        <br/>
+        <label> Stats:</label>
         <input type="radio" name="barFilter" value="passYards" {% if bar_filters == 'passYards' %}checked{% endif %}> Passing Yards
         <input type="radio" name="barFilter" value="rushYards" {% if bar_filters == 'rushYards' %}checked{% endif %}> Rushing Yards
         <input type="radio" name="barFilter" value="recYds" {% if bar_filters == 'recYds' %}checked{% endif %}> Receiving Yards
         <input type="radio" name="barFilter" value="receptions" {% if bar_filters == 'receptions' %}checked{% endif %}> Receptions    
-                     
-        <button align="inline" type="submit" name="action" value="filter_chart" class="btn btn-secondary">Apply Filter</button>
+        <input type="radio" name="barFilter" value="touchdowns" {% if bar_filters == 'touchdowns' %}checked{% endif %}> Touchdowns             
+        <br/>
+
+        <label>Year: </label>
+        <input type="radio" name="yearFilter" value="2021" {% if year_filter == '2021' %}checked{% endif %}> 2021
+        <input type="radio" name="yearFilter" value="2022" {% if year_filter == '2022' %}checked{% endif %}> 2022
+        <input type="radio" name="yearFilter" value="2023" {% if year_filter == '2023' %}checked{% endif %}> 2023
+        <input type="radio" name="yearFilter" value="2024" {% if year_filter == '2024' %}checked{% endif %}> 2024
+        <input type="radio" name="yearFilter" value="2025" {% if year_filter == '2025' %}checked{% endif %}> 2025
+
     </div>
+    <button align="center" type="submit" name="action" value="filter_chart" class="btn btn-secondary">Apply Filter</button>
 </form>
 <hr />
 
@@ -76,21 +81,22 @@
                 {% endif %}
                 {% if 'rushing' in table_filters %}
                     <th>Rushing Yards</th>
-                    <th>Rushing TD</th>
+                    <th>Carries</th>
                 {% endif %}
                 {% if 'receiving' in table_filters %}
                     <th>Receptions</th>
                     <th>Receiving Yards</th>
                     <th>Targets</th>
-                    <th>Receiving TD</th>
                 {% endif %}
-                {% if 'kicking' in table_filters %}
-                    <th>Kicking</th>
+                {% if 'touchdowns' in table_filters %}
+                    <th>Rushing TD</td>
+                    <th>Receiving TD</td>
+                    <th>Total Touchdowns</th>
                 {% endif %}
             </tr>
         </thead>
         <tbody>
-            {% for log in game_logs %}
+            {% for log in game_logs_desc %}
             <tr>
                 <td>{{ log.year }}</td>
                 <td>{{ log.week }}</td>
@@ -104,7 +110,7 @@
 
                 {% if 'rushing' in table_filters %}
                     <td>{{ log.rushYards }}</td>
-                    <td>{{ log.rushTD }}</td>
+                    <td>{{ log.carries }}</td>
 
                 {% endif %}
 
@@ -112,7 +118,11 @@
                     <td>{{ log.receptions }}</td>    
                     <td>{{ log.recYds }}</td>
                     <td>{{ log.targets }}</td>
+                {% endif %}
+                {% if 'touchdowns' in table_filters %}
+                    <td>{{ log.rushTD }}</td>
                     <td>{{ log.recTD }}</td>
+                    <td>{{ log.rushTD  + log.recTD}}</td>    
                 {% endif %}
 
             </tr>
@@ -134,7 +144,16 @@
         }
     
         const updatedChartData = {
-            labels: [{% for log in game_logs2 %}'Week {{ log.week }}' {% if not loop.last %},{% endif %}{% endfor %}],
+            labels: [
+                {% for log in game_logs_asc %}
+                    {% if log.playerOpp == "Bye" %}
+                        'BYE'
+                    {%else%}
+                        '{{ log.year }}'
+                    {%endif%}
+                {% if not loop.last %},{% endif %}
+            {% endfor %}
+            ],
             datasets: [{
                 label: barLabel,
                 data: barData,
@@ -152,6 +171,13 @@
                 scales: {
                     y: {
                         beginAtZero: true
+                    },
+                    x: {
+                        ticks: {
+                            font:{
+                                size: 10
+                            }
+                        }
                     }
                 }
             }
@@ -162,7 +188,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const initialBarLabel = '{{ bar_filters }}';
         const initialBarData = JSON.parse('{{ bar_data | tojson }}');
-        updateChart(initialBarLabel, initialBarData);
+        updateChart(initialBarLabel, initialBarData, );
     });
 
 </script>

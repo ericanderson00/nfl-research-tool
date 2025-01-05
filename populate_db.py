@@ -23,82 +23,6 @@ def clone_and_update_repo():
         subprocess.run(["git", "-C", data_path, "pull"], check=True)
 
 
-### -------------- This script uses the data from the github that i have saved ---------------------
-# def populate_database():
-#     with app.app_context():
-#         for year in os.listdir(data_path):  # Loop through year folders
-#             if int(year) < 2021:
-#                 continue
-#             year_path = os.path.join(data_path, year)
-    
-#             if os.path.isdir(year_path):
-#                 for week in os.listdir(year_path):  # Loop through week folders
-#                     week_path = os.path.join(year_path, week)
-                    
-#                     if not os.path.isdir(week_path) or week == "projected":
-#                         continue
-                    
-#                     for file in os.listdir(week_path):  # Loop through JSON files
-#                         if not file.endswith(".json") or "season" in file.lower():  # Skip unwanted JSON files
-#                             continue
-#                         if file.endswith(".json"):
-#                             pos = file.replace(".json", "")
-#                             file_path = os.path.join(week_path, file)
-
-#                             # Load the JSON data
-#                             with open(file_path, "r") as f:
-#                                 data = json.load(f)
-
-#                             for player in data:  # Process each player's data
-#                                 player_id = int(player["PlayerId"])
-#                                 player_name = player["PlayerName"]
-#                                 position = player["Pos"]
-#                                 team = player["Team"]
-
-#                                 # 1. Check if PlayerInfo already exists
-#                                 existing_player = PlayerInfo.query.filter_by(playerID=player_id).first()
-#                                 if not existing_player:  # Add new player if they don't exist
-#                                     new_player = PlayerInfo(
-#                                         playerID=player_id,
-#                                         playerName=player_name,
-#                                         pos=position,
-#                                         team=team
-#                                     )
-#                                     db.session.add(new_player)
-
-#                                 # 2. Check if GameLog already exists for this player, year, and week
-#                                 existing_log = GameLog.query.filter_by(
-#                                     playerID=player_id,
-#                                     year=(year),
-#                                     week=int(week.replace("week_", ""))
-#                                 ).first()
-
-#                                 if not existing_log:  # Add game log only if it doesn't exist
-#                                     game_log = GameLog(
-#                                         playerID=player_id,
-#                                         playerOpp=player.get("PlayerOpponent"),
-#                                         week=int(week.replace("week_", "")),
-#                                         year=int(year),
-                                        
-#                                         rushYards=int(player.get("RushingYDS", 0) or 0),
-#                                         rushTD=int(player.get("RushingTD", 0) or 0),
-                                        
-#                                         receptions=int(player.get("ReceivingRec", 0) or 0),
-#                                         recYds=int(player.get("ReceivingYDS", 0) or 0),
-#                                         recTD=int(player.get("ReceivingTD", 0) or 0),
-                                        
-#                                         passYards=int(player.get("PassingYDS", 0) or 0),
-#                                         passTD=int(player.get("PassingTD", 0) or 0),
-#                                         interceptions=int(player.get("PassingInt", 0) or 0),
-                                        
-#                                         targets=int(player.get("Targets", 0) or 0),
-#                                         carries=int(player.get("TouchCarries", 0) or 0)
-#                                     )
-#                                     db.session.add(game_log)
-
-#         # Commit all changes to the database after processing all files
-#         db.session.commit()
-#         print("Database successfully populated with the latest data!")
 def populate_database():
     with app.app_context():
         
@@ -187,6 +111,6 @@ def populate_database():
 
 
 print("Starting repository update and database population...")
-# clone_and_update_repo()  # Clone or pull the latest data
+clone_and_update_repo()  # Clone or pull the latest data
 populate_database()  # Populate the database with the latest data
 print("All tasks completed successfully!")
