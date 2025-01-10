@@ -24,13 +24,15 @@
 <p><strong>Position:</strong> {{ player.pos }}</p>
 
 <hr />
-<form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
+{# <form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID, table_filters='+'.join(table_filters), bar_filters=bar_filters, year_filter=year_filter) }}"> #}
+
+<form id="filterForm" method="POST" >
+
     <label><strong>Filters for Game Logs: </strong></label>
     <div class="d-inline">
         <input type="checkbox" name="tableFilter" value="passing" {% if 'passing' in table_filters %}checked{% endif %}> Passing
         <input type="checkbox" name="tableFilter" value="rushing" {% if 'rushing' in table_filters %}checked{% endif %}> Rushing
         <input type="checkbox" name="tableFilter" value="receiving" {% if 'receiving' in table_filters %}checked{% endif %}> Receiving
-        <input type="checkbox" name="tableFilter" value="kicking" {% if 'kicking' in table_filters %}checked{% endif %}> Kicking
         <input type="checkbox" name="tableFilter" value="touchdowns" {% if 'touchdowns' in table_filters %}checked{% endif %}> Touchdowns
     </div>
     
@@ -46,15 +48,34 @@
         <br/>
 
         <label>Year: </label>
+        <input type="radio" name="yearFilter" value="all" {% if year_filter == 'all' %}checked{% endif %}> All
         <input type="radio" name="yearFilter" value="2021" {% if year_filter == '2021' %}checked{% endif %}> 2021
         <input type="radio" name="yearFilter" value="2022" {% if year_filter == '2022' %}checked{% endif %}> 2022
         <input type="radio" name="yearFilter" value="2023" {% if year_filter == '2023' %}checked{% endif %}> 2023
         <input type="radio" name="yearFilter" value="2024" {% if year_filter == '2024' %}checked{% endif %}> 2024
         <input type="radio" name="yearFilter" value="2025" {% if year_filter == '2025' %}checked{% endif %}> 2025
-
+        <p>Debug Selected Year Filter: {{ yearFilter }}</p>
     </div>
-    <button align="center" type="submit" name="action" value="filter_chart" class="btn btn-secondary">Apply Filter</button>
+    <button id="applyFilterButton" type="submit" name="action" value="filter_chart" class="btn btn-secondary">Apply Filter</button>
 </form>
+
+{# updates url depending on filters applied by user #}
+<script>
+    document.getElementById('applyFilterButton').addEventListener('click', function () {
+        const form = document.getElementById('filterForm');
+        const formData = new FormData(form);
+
+        // Get the year filter value
+        const yearFilter = formData.get('yearFilter');
+        const tableFilters = Array.from(formData.getAll('tableFilter')).join('+');
+        const barFilter = formData.get('barFilter');
+
+        // Redirect with updated query parameters
+        const url = `{{ url_for('views.playerProfile', player_id=player.playerID) }}?table_filters=${tableFilters}&bar_filters=${barFilter}&year_filter=${yearFilter}`;
+        form.action = url;
+        form.submit();
+    });
+</script>
 <hr />
 
 <!--test code--> 
@@ -96,37 +117,38 @@
             </tr>
         </thead>
         <tbody>
-            {% for log in game_logs_desc %}
+            {% for gamelog in game_logs_desc %}
             <tr>
-                <td>{{ log.year }}</td>
-                <td>{{ log.week }}</td>
-                <td>{{ log.playerOpp }}</td>
+                <td>{{ gamelog.year }}</td>
+                <td>{{ gamelog.week }}</td>
+                <td>{{ gamelog.playerOpp }}</td>
 
                 {% if 'passing' in table_filters %}
-                    <td>{{ log.passYards }}</td>
-                    <td>{{ log.passTD }}</td>
-                    <td>{{ log.interceptions }}</td>
+                    <td>{{ gamelog.passYards }}</td>
+                    <td>{{ gamelog.passTD }}</td>
+                    <td>{{ gamelog.interceptions }}</td>
                 {%endif%}
 
                 {% if 'rushing' in table_filters %}
-                    <td>{{ log.rushYards }}</td>
-                    <td>{{ log.carries }}</td>
+                    <td>{{ gamelog.rushYards }}</td>
+                    <td>{{ gamelog.carries }}</td>
 
                 {% endif %}
 
                 {% if 'receiving' in table_filters %}
-                    <td>{{ log.receptions }}</td>    
-                    <td>{{ log.recYds }}</td>
-                    <td>{{ log.targets }}</td>
+                    <td>{{ gamelog.receptions }}</td>    
+                    <td>{{ gamelog.recYds }}</td>
+                    <td>{{ gamelog.targets }}</td>
                 {% endif %}
                 {% if 'touchdowns' in table_filters %}
-                    <td>{{ log.rushTD }}</td>
-                    <td>{{ log.recTD }}</td>
-                    <td>{{ log.rushTD  + log.recTD}}</td>    
+                    <td>{{ gamelog.rushTD }}</td>
+                    <td>{{ gamelog.recTD }}</td>
+                    <td>{{ gamelog.rushTD  + gamelog.recTD}}</td>    
                 {% endif %}
 
             </tr>
             {% endfor %}
+
         </tbody>
     </table>
 </div>
@@ -142,17 +164,17 @@
         if (gameLogsChart) {
             gameLogsChart.destroy();
         }
-    
+
         const updatedChartData = {
             labels: [
-                {% for log in game_logs_asc %}
-                    {% if log.playerOpp == "Bye" %}
+                {% for gamelog in game_logs_asc_by_year %}
+                    {% if gamelog.playerOpp == "Bye" %}
                         'BYE'
                     {%else%}
-                        '{{ log.year }}'
+                        '{{gamelog.week}} | {{gamelog.playerOpp}}'
                     {%endif%}
-                {% if not loop.last %},{% endif %}
-            {% endfor %}
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
             ],
             datasets: [{
                 label: barLabel,
@@ -167,6 +189,18 @@
             type: 'bar',
             data: updatedChartData,
             options: {
+                plugins:{
+                    tooltip:{
+                        callbacks:{
+                            title: function(context){
+                                const index = context[0].dataIndex; // Get the index of the data point
+                                const gamelog = {{ game_logs_asc_by_year | tojson }}[index]; // Access the gamelog data
+                                return `Week ${gamelog.week}\nYear: ${gamelog.year}\nOpponent: ${gamelog.playerOpp}`;
+                            }
+                        }
+                    }
+                    
+                },
                 responsive: true,
                 scales: {
                     y: {

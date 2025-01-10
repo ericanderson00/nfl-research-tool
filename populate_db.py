@@ -75,6 +75,12 @@ def populate_database():
                                 )
                                 new_players.append(new_player)
                                 existing_players[player_id] = new_player  # Cache the new player
+                            else:
+                                #updates player's team if traded or drafted
+                                existing_player = existing_players[player_id]
+                                if existing_player.team != team:
+                                    existing_player.team = team
+                                    db.session.add(existing_player)
 
                             # Check if GameLog already exists
                             week_number = int(week.replace("week_", ""))

@@ -1,0 +1,200 @@
+{% extends "base.html" %} {% block title %}Player Profile{% endblock %}
+{%block content%}
+
+<br />
+<form align="center" action="{{ url_for('views.searchPlayer') }}" method="POST">
+    <div class="form-group">
+        <label for="playerName">Search for a Player:</label>
+        <input
+            type="text"
+            id="playerName"
+            name="playerName"
+            class="form-control"
+            placeholder="Enter player name"
+            required
+        />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+    
+</form>
+
+<!-- <h1>{{bar_filters}}</h1> -->
+<h1>Player Profile: {{ player.playerName }}</h1>
+<p><strong>Team:</strong> {{ player.team }}</p>
+<p><strong>Position:</strong> {{ player.pos }}</p>
+
+<hr />
+<form method="POST" action="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
+    <label><strong>Filters for Game Logs: </strong></label>
+    <div class="d-inline">
+        <input type="checkbox" name="tableFilter" value="passing" {% if 'passing' in table_filters %}checked{% endif %}> Passing
+        <input type="checkbox" name="tableFilter" value="rushing" {% if 'rushing' in table_filters %}checked{% endif %}> Rushing
+        <input type="checkbox" name="tableFilter" value="receiving" {% if 'receiving' in table_filters %}checked{% endif %}> Receiving
+        <input type="checkbox" name="tableFilter" value="kicking" {% if 'kicking' in table_filters %}checked{% endif %}> Kicking
+        <input type="checkbox" name="tableFilter" value="touchdowns" {% if 'touchdowns' in table_filters %}checked{% endif %}> Touchdowns
+    </div>
+    
+    <div >
+        <label><strong>Filters for Chart: </strong></label>
+        <br/>
+        <label> Stats:</label>
+        <input type="radio" name="barFilter" value="passYards" {% if bar_filters == 'passYards' %}checked{% endif %}> Passing Yards
+        <input type="radio" name="barFilter" value="rushYards" {% if bar_filters == 'rushYards' %}checked{% endif %}> Rushing Yards
+        <input type="radio" name="barFilter" value="recYds" {% if bar_filters == 'recYds' %}checked{% endif %}> Receiving Yards
+        <input type="radio" name="barFilter" value="receptions" {% if bar_filters == 'receptions' %}checked{% endif %}> Receptions    
+        <input type="radio" name="barFilter" value="touchdowns" {% if bar_filters == 'touchdowns' %}checked{% endif %}> Touchdowns             
+        <br/>
+
+        <label>Year: </label>
+        <input type="radio" name="yearFilter" value="all" {% if year_filter == 'all' %}checked{% endif %}> All
+        <input type="radio" name="yearFilter" value="2021" {% if year_filter == '2021' %}checked{% endif %}> 2021
+        <input type="radio" name="yearFilter" value="2022" {% if year_filter == '2022' %}checked{% endif %}> 2022
+        <input type="radio" name="yearFilter" value="2023" {% if year_filter == '2023' %}checked{% endif %}> 2023
+        <input type="radio" name="yearFilter" value="2024" {% if year_filter == '2024' %}checked{% endif %}> 2024
+        <input type="radio" name="yearFilter" value="2025" {% if year_filter == '2025' %}checked{% endif %}> 2025
+
+    </div>
+    <button align="center" type="submit" name="action" value="filter_chart" class="btn btn-secondary">Apply Filter</button>
+</form>
+<hr />
+
+<!--test code--> 
+
+<br />
+
+<div id="chartContainer">
+    <canvas id="gameLogsChart"></canvas>
+</div>
+
+
+<h2>Game Logs</h2>
+<div class="chart-container">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Year</th>
+                <th>Week</th>
+                <th>Opponent</th>
+                {% if 'passing' in table_filters %}
+                    <th>Passing Yards</th>
+                    <th>Passing TD</th>
+                    <th>Interceptions</th>
+                {% endif %}
+                {% if 'rushing' in table_filters %}
+                    <th>Rushing Yards</th>
+                    <th>Carries</th>
+                {% endif %}
+                {% if 'receiving' in table_filters %}
+                    <th>Receptions</th>
+                    <th>Receiving Yards</th>
+                    <th>Targets</th>
+                {% endif %}
+                {% if 'touchdowns' in table_filters %}
+                    <th>Rushing TD</td>
+                    <th>Receiving TD</td>
+                    <th>Total Touchdowns</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for gamelog in game_logs_desc %}
+            <tr>
+                <td>{{ gamelog.year }}</td>
+                <td>{{ gamelog.week }}</td>
+                <td>{{ gamelog.playerOpp }}</td>
+
+                {% if 'passing' in table_filters %}
+                    <td>{{ gamelog.passYards }}</td>
+                    <td>{{ gamelog.passTD }}</td>
+                    <td>{{ gamelog.interceptions }}</td>
+                {%endif%}
+
+                {% if 'rushing' in table_filters %}
+                    <td>{{ gamelog.rushYards }}</td>
+                    <td>{{ gamelog.carries }}</td>
+
+                {% endif %}
+
+                {% if 'receiving' in table_filters %}
+                    <td>{{ gamelog.receptions }}</td>    
+                    <td>{{ gamelog.recYds }}</td>
+                    <td>{{ gamelog.targets }}</td>
+                {% endif %}
+                {% if 'touchdowns' in table_filters %}
+                    <td>{{ gamelog.rushTD }}</td>
+                    <td>{{ gamelog.recTD }}</td>
+                    <td>{{ gamelog.rushTD  + gamelog.recTD}}</td>    
+                {% endif %}
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    let gameLogsChart;
+
+    function updateChart(barLabel, barData) {
+        const chartContainer = document.getElementById('chartContainer');
+        const chartElement = document.getElementById('gameLogsChart');
+    
+        if (gameLogsChart) {
+            gameLogsChart.destroy();
+        }
+    
+        const updatedChartData = {
+            labels: [
+                {% for gamelog in game_logs_asc_by_year %}
+                    {% if gamelog.playerOpp == "Bye" %}
+                        'BYE'
+                    {%else%}
+                        '{{gamelog.week}} | {{gamelog.playerOpp}} | {{ gamelog.year }}'
+                    {%endif%}
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: barLabel,
+                data: barData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 1
+            }]
+        };
+    
+        gameLogsChart = new Chart(chartElement, {
+            type: 'bar',
+            data: updatedChartData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    },
+                    x: {
+                        ticks: {
+                            font:{
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // On page load, initialize the chart
+    document.addEventListener('DOMContentLoaded', function () {
+        const initialBarLabel = '{{ bar_filters }}';
+        const initialBarData = JSON.parse('{{ bar_data | tojson }}');
+        updateChart(initialBarLabel, initialBarData, );
+    });
+
+</script>
+
+
+
+{%endblock%}

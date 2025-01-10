@@ -59,7 +59,18 @@ class GameLog(db.Model):
     passAttempts = db.Column(db.Integer, default=0) #add later
     passAvg = db.Column(db.Float, default=0) #add later
     
+    fanPoints = db.Column(db.Float)
     
     
-    
-    fanPoints = db.Column(db.Float)     
+    def __init__(self, week, year, playerOpp):
+        self.week = week
+        self.year = year
+        self.playerOpp = playerOpp
+        
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'week': self.week,
+            'year': self.year,
+            'playerOpp': self.playerOpp
+        }

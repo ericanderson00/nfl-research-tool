@@ -13,9 +13,9 @@ table th, table td {
 /* } */
 
 
-.chart-container {
-    max-width: 100px; /* Set the max width to limit the stretch */
+ #chartContainer {
+    width: 100%; /* Set the max width to limit the stretch */
+    max-width: 1200px;
     margin: 0 auto;   /* Center the chart horizontally */
     padding: 20px;    /* Optional padding for some spacing around the chart */
 }
-
