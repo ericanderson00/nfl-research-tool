@@ -26,7 +26,7 @@
     <ul>
         {% for player in search_results %}
             <li>
-                <a href="{{ url_for('views.playerProfile', player_id=player.playerID, bar_filters='passYards', table_filters=[], year_filter='all') }}">
+                <a href="{{ url_for('views.playerProfile', player_id=player.playerID) }}">
                     {{ player.playerName }} ( {{ player.team }} - {{ player.pos }} )
                 </a>
             </li>

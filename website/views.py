@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user #this is why I need UserMixin in models.py
-from .models import Note, PlayerInfo, GameLog
+from .models import Note, PlayerInfo, GameLog, Subscription
 from . import db
 import json
+from datetime import datetime
 
 
 
@@ -10,7 +11,28 @@ import json
 
 views = Blueprint('views', __name__)
 
-@views.route('/', methods=['GET']) # home page and what ever is / will run 
+@views.route('/')
+def landing_page():
+    return render_template('landing.html')
+
+@views.route('/subscribe', methods=['POST'])
+def subscribe():
+    email = request.form.get('email')
+    if email:
+        exisisting_sub = Subscription.query.filter_by(email=email).first()
+        if exisisting_sub:
+            flash('You are already subscribed!', category='error')
+        else:
+            new_sub = Subscription(email=email)
+            db.session.add(new_sub)
+            db.session.commit()
+            flash('Thank you for subscribing! We will notifiy you when we go live.', category='success')
+    else:
+        flash('Please Enter a valid email address.', category='error')
+    return redirect('/')
+
+
+@views.route('/home', methods=['GET']) # home page and what ever is / will run 
 @login_required # cant get to home page unless logged in
 def home():
     return render_template("home.html", user=current_user) 
@@ -74,16 +96,28 @@ def searchPlayer():
 # def playerProfile(player_id, table_filters, bar_filters, year_filter):
 def playerProfile(player_id):
     
+    # sets current football season
+    if datetime.now().month == 1 or datetime.now().month == 2:    
+        curr_fb_season = datetime.now().year - 1
+    else:
+        curr_fb_season = datetime.now().year
+        
+        
     # gets the filters for stats from the url instead of the passed value
     table_filters = request.args.get('table_filters', '').split('+')
-    bar_filters = request.args.get('bar_filters', 'passYards')
-    year_filter = request.args.get('year_filter', 'all')
+    bar_filters = request.args.get('bar_filters')
+    year_filter = request.args.get('year_filter', curr_fb_season) 
     
     # table_filters = table_filters.split('+') if isinstance(table_filters, str) else table_filters
     barDataArr = []
     game_logs_asc_by_year = []
+    recBettingLineArr = []
     
-
+    #method that pulls betting line from api or scraper
+    #--------------put right here------------------------#
+    #|                                                   |
+    #----------------------------------------------------#
+    recBettingLine = 3.5
     
         
     # print(f"Searching for player with ID: {player_id}")
@@ -161,6 +195,7 @@ def playerProfile(player_id):
         elif bar_filters == 'receptions':
             for i in game_logs_asc_all:
                 barDataArr.append(i.receptions)
+                recBettingLineArr.append(recBettingLine)
         elif bar_filters == 'touchdowns':
             for i in game_logs_asc_all:
                 totalTD = i.recTD + i.rushTD
@@ -179,6 +214,7 @@ def playerProfile(player_id):
         elif bar_filters == 'receptions':
             for i in game_logs_asc_by_year:
                 barDataArr.append(i.receptions)
+                recBettingLineArr.append(recBettingLine)
         elif bar_filters == 'touchdowns':
             for i in game_logs_asc_by_year:
                 totalTD = i.recTD + i.rushTD
@@ -193,6 +229,8 @@ def playerProfile(player_id):
     for gamelog in game_logs_asc_by_year:
         gamelog_to_dict.append(gamelog.to_dict())
     
+    # bettingLine = 5.5
+    
     print(year_filter)
     return render_template(
         "player_profile.html", 
@@ -203,14 +241,14 @@ def playerProfile(player_id):
         table_filters=table_filters,
         bar_filters=bar_filters,
         bar_data=barDataArr,
-        year_filter=year_filter
+        year_filter=year_filter,\
+        betting_line=recBettingLineArr
         # game_logs=game_logs,
     )
     
     
     
-    # Testing api endpoint needs fixing
-    
+# Testing api endpoint needs fixing
 @views.route('/api/gamelogs', methods=['GET'])
 def get_gamelogs():
     # Get query parameters

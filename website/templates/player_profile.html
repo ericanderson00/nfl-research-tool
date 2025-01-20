@@ -54,7 +54,7 @@
         <input type="radio" name="yearFilter" value="2023" {% if year_filter == '2023' %}checked{% endif %}> 2023
         <input type="radio" name="yearFilter" value="2024" {% if year_filter == '2024' %}checked{% endif %}> 2024
         <input type="radio" name="yearFilter" value="2025" {% if year_filter == '2025' %}checked{% endif %}> 2025
-        <p>Debug Selected Year Filter: {{ yearFilter }}</p>
+        <p>Debug Selected Year Filter: {{yearFilter}}</p>
     </div>
     <button id="applyFilterButton" type="submit" name="action" value="filter_chart" class="btn btn-secondary">Apply Filter</button>
 </form>
@@ -105,8 +105,8 @@
                     <th>Carries</th>
                 {% endif %}
                 {% if 'receiving' in table_filters %}
-                    <th>Receptions</th>
                     <th>Receiving Yards</th>
+                    <th>Receptions</th>
                     <th>Targets</th>
                 {% endif %}
                 {% if 'touchdowns' in table_filters %}
@@ -136,8 +136,8 @@
                 {% endif %}
 
                 {% if 'receiving' in table_filters %}
+                    <td>{{ gamelog.recYds }}</td>    
                     <td>{{ gamelog.receptions }}</td>    
-                    <td>{{ gamelog.recYds }}</td>
                     <td>{{ gamelog.targets }}</td>
                 {% endif %}
                 {% if 'touchdowns' in table_filters %}
@@ -157,7 +157,7 @@
 <script>
     let gameLogsChart;
 
-    function updateChart(barLabel, barData) {
+    function updateChart(barLabel, barData, bettingLine) {
         const chartContainer = document.getElementById('chartContainer');
         const chartElement = document.getElementById('gameLogsChart');
     
@@ -176,13 +176,28 @@
                     {% if not loop.last %},{% endif %}
                 {% endfor %}
             ],
-            datasets: [{
+            datasets: [
+            {
                 label: barLabel,
                 data: barData,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderWidth: 1
-            }]
+                borderWidth: 1,
+                type: 'bar',
+                order: 1
+            },
+            {
+                label: "Betting line",
+                data: Array({{ game_logs_asc_by_year|length }}).fill({{ betting_line }}), // Fill with betting line value,
+                borderColor: 'rgb(192, 75, 75)',
+                backgroundColor: 'rgb(192, 75, 75)',
+                borderWidth: 3,
+                type: 'line',
+                tension: 0.4, // Smooth line curve
+                pointRadius: 1, // Add points for better visibility
+                order: 0
+            }
+            ]
         };
     
         gameLogsChart = new Chart(chartElement, {
@@ -192,13 +207,16 @@
                 plugins:{
                     tooltip:{
                         callbacks:{
-                            title: function(context){
+                            beforeTitle: function(context){
                                 const index = context[0].dataIndex; // Get the index of the data point
                                 const gamelog = {{ game_logs_asc_by_year | tojson }}[index]; // Access the gamelog data
                                 return `Week ${gamelog.week}\nYear: ${gamelog.year}\nOpponent: ${gamelog.playerOpp}`;
+                            },
+                            label: function(){
+                                return '';
                             }
                         }
-                    }
+                    },
                     
                 },
                 responsive: true,
@@ -222,7 +240,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         const initialBarLabel = '{{ bar_filters }}';
         const initialBarData = JSON.parse('{{ bar_data | tojson }}');
-        updateChart(initialBarLabel, initialBarData, );
+        const initalBettingLine = JSON.parse('{{betting_line | tojson}}');
+        updateChart(initialBarLabel, initialBarData, initalBettingLine);
     });
 
 </script>

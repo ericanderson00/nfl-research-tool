@@ -74,3 +74,8 @@ class GameLog(db.Model):
             'year': self.year,
             'playerOpp': self.playerOpp
         }
+        
+        
+class Subscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(150), unique=True)
